@@ -7,14 +7,14 @@ StringeeConversation _conversation;
 
 class ConversationInfor extends StatefulWidget {
   ConversationInfor(
-      {@required StringeeClient client, @required StringeeConversation conversation}) {
+      {@required StringeeClient client,
+      @required StringeeConversation conversation}) {
     _client = client;
     _conversation = conversation;
   }
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return ConversationInforState();
   }
 }
@@ -27,7 +27,6 @@ class ConversationInforState extends State<ConversationInfor> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _log = new List();
@@ -60,8 +59,9 @@ class ConversationInforState extends State<ConversationInfor> {
         if (objectChange.objectType == ObjectType.message) {
           StringeeMessage message = objectChange.objects.first;
           setState(() {
-            _log.add(
-                (message.id != null) ? message.id : 'null' + ' ' + objectChange.type.toString());
+            _log.add((message.id != null)
+                ? message.id
+                : 'null' + ' ' + objectChange.type.toString());
           });
         }
       }
@@ -70,7 +70,6 @@ class ConversationInforState extends State<ConversationInfor> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return new Scaffold(
       appBar: AppBar(
         title: Text("Conversation infor"),
@@ -193,7 +192,8 @@ class ConversationInforState extends State<ConversationInfor> {
                             _conversation.delete().then((value) {
                               print(value.toString());
                               setState(() {
-                                _log.add('Delete conversation: msg:' + value['message']);
+                                _log.add('Delete conversation: msg:' +
+                                    value['message']);
                               });
                             });
                           },
@@ -213,7 +213,8 @@ class ConversationInforState extends State<ConversationInfor> {
                             _conversation.addParticipants(users).then((value) {
                               print(value.toString());
                               setState(() {
-                                _log.add('Add participants: msg:' + value['message']);
+                                _log.add('Add participants: msg:' +
+                                    value['message']);
                               });
                             });
                           },
@@ -238,10 +239,13 @@ class ConversationInforState extends State<ConversationInfor> {
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              _conversation.removeParticipants(users).then((value) {
+                              _conversation
+                                  .removeParticipants(users)
+                                  .then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Remove participants: msg:' + value['message']);
+                                  _log.add('Remove participants: msg:' +
+                                      value['message']);
                                 });
                               });
                             },
@@ -261,7 +265,8 @@ class ConversationInforState extends State<ConversationInfor> {
                               _conversation.sendMessage(msg).then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Send message: msg:' + value['message']);
+                                  _log.add(
+                                      'Send message: msg:' + value['message']);
                                 });
                               });
                             },
@@ -293,7 +298,8 @@ class ConversationInforState extends State<ConversationInfor> {
                               ]).then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Get messages: msg:' + value['message']);
+                                  _log.add(
+                                      'Get messages: msg:' + value['message']);
                                   if (value['status']) {
                                     _messages.clear();
                                     _messages.addAll(value['body']);
@@ -317,7 +323,8 @@ class ConversationInforState extends State<ConversationInfor> {
                               _conversation.getLocalMessages(3).then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Get local Messages: msg:' + value['message']);
+                                  _log.add('Get local Messages: msg:' +
+                                      value['message']);
                                   if (value['status']) {
                                     _messages.clear();
                                     _messages.addAll(value['body']);
@@ -350,7 +357,8 @@ class ConversationInforState extends State<ConversationInfor> {
                               _conversation.getLastMessages(50).then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Get last Messages: msg:' + value['message']);
+                                  _log.add('Get last Messages: msg:' +
+                                      value['message']);
                                   if (value['status']) {
                                     _messages.clear();
                                     _messages.addAll(value['body']);
@@ -371,10 +379,13 @@ class ConversationInforState extends State<ConversationInfor> {
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              _conversation.getMessagesAfter(50, 4).then((value) {
+                              _conversation
+                                  .getMessagesAfter(50, 4)
+                                  .then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Get Messages after: msg:' + value['message']);
+                                  _log.add('Get Messages after: msg:' +
+                                      value['message']);
                                   if (value['status']) {
                                     _messages.clear();
                                     _messages.addAll(value['body']);
@@ -404,10 +415,13 @@ class ConversationInforState extends State<ConversationInfor> {
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              _conversation.getMessagesBefore(50, 4).then((value) {
+                              _conversation
+                                  .getMessagesBefore(50, 4)
+                                  .then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Get Messages before: msg:' + value['message']);
+                                  _log.add('Get Messages before: msg:' +
+                                      value['message']);
                                   if (value['status']) {
                                     _messages.clear();
                                     _messages.addAll(value['body']);
@@ -428,11 +442,15 @@ class ConversationInforState extends State<ConversationInfor> {
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              String newConvName = _conversation.name + ' NEW NAME';
-                              _conversation.updateConversation(newConvName).then((value) {
+                              String newConvName =
+                                  _conversation.name + ' NEW NAME';
+                              _conversation
+                                  .updateConversation(newConvName)
+                                  .then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Update Conversation: msg:' + value['message']);
+                                  _log.add('Update Conversation: msg:' +
+                                      value['message']);
                                 });
                               });
                             },
@@ -458,7 +476,9 @@ class ConversationInforState extends State<ConversationInfor> {
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              _conversation.setRole('id1', UserRole.member).then((value) {
+                              _conversation
+                                  .setRole('id1', UserRole.member)
+                                  .then((value) {
                                 print(value.toString());
                                 setState(() {
                                   _log.add('Set role: msg:' + value['message']);
@@ -478,10 +498,12 @@ class ConversationInforState extends State<ConversationInfor> {
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              _conversation.deleteMessages(['msgid1', 'msgid2']).then((value) {
+                              _conversation.deleteMessages(
+                                  ['msgid1', 'msgid2']).then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Delete messages: msg:' + value['message']);
+                                  _log.add('Delete messages: msg:' +
+                                      value['message']);
                                 });
                               });
                             },
@@ -507,11 +529,12 @@ class ConversationInforState extends State<ConversationInfor> {
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              _conversation
-                                  .revokeMessages(['msgid1', 'msgid2'], true).then((value) {
+                              _conversation.revokeMessages(
+                                  ['msgid1', 'msgid2'], true).then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Revoke messages: msg:' + value['message']);
+                                  _log.add('Revoke messages: msg:' +
+                                      value['message']);
                                 });
                               });
                             },
@@ -531,7 +554,8 @@ class ConversationInforState extends State<ConversationInfor> {
                               _conversation.markAsRead().then((value) {
                                 print(value.toString());
                                 setState(() {
-                                  _log.add('Mark conversation as read: msg:' + value['message']);
+                                  _log.add('Mark conversation as read: msg:' +
+                                      value['message']);
                                 });
                               });
                             },

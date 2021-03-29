@@ -43,11 +43,11 @@ class StringeeMessage {
 
   @override
   String toString() {
-    return '{id: ${id}, localId: ${localId}, convId: ${convId}, senderId: ${senderId}, createdAt: ${createdAt}, sequence: ${sequence}, state: ${state}, type: ${type}, text: ${text},'
-        ' thumbnail: ${thumbnail}, filePath: ${filePath}, fileUrl: ${fileUrl},'
-        ' latitude: ${latitude}, longitude: ${longitude}, fileName: ${fileName}, fileLength: ${fileLength},'
-        ' duration: ${duration}, ratio: ${ratio}, vcard: ${vcard}, stickerCategory: ${stickerCategory},'
-        ' stickerName: ${stickerName}, customData: ${customData}, notiContent: ${notiContent}}';
+    return '{id: $id, localId: $localId, convId: $convId, senderId: $senderId, createdAt: $createdAt, sequence: $sequence, state: $state, type: $type, text: $text,'
+        ' thumbnail: $thumbnail, filePath: $filePath, fileUrl: $fileUrl,'
+        ' latitude: $latitude, longitude: $longitude, fileName: $fileName, fileLength: $fileLength,'
+        ' duration: $duration, ratio: $ratio, vcard: $vcard, stickerCategory: $stickerCategory,'
+        ' stickerName: $stickerName, customData: $customData, notiContent: $notiContent}';
   }
 
   StringeeMessage.typeText(
@@ -234,6 +234,7 @@ class StringeeMessage {
 
   set convId(String value) {
     _convId = value;
+    print('Set convId: ' + _convId);
   }
 
   StringeeMessage.fromJson(Map<dynamic, dynamic> msgInfor) {
@@ -323,7 +324,8 @@ class StringeeMessage {
         this._notiContent['type'] = notifyType;
         switch (notifyType) {
           case MsgNotifyType.addParticipants:
-            StringeeUser user = new StringeeUser.fromJson(notifyMap['addedInfo']);
+            StringeeUser user =
+                new StringeeUser.fromJson(notifyMap['addedInfo']);
             this._notiContent['addedby'] = user;
             List<StringeeUser> participants = [];
             List<dynamic> participantArray = notifyMap['participants'];
@@ -334,7 +336,8 @@ class StringeeMessage {
             this._notiContent["participants"] = participants;
             break;
           case MsgNotifyType.removeParticipants:
-            StringeeUser user = new StringeeUser.fromJson(notifyMap['removedInfo']);
+            StringeeUser user =
+                new StringeeUser.fromJson(notifyMap['removedInfo']);
             this._notiContent['removedBy'] = user;
             List<StringeeUser> participants = [];
             List<dynamic> participantArray = notifyMap['participants'];
@@ -353,8 +356,15 @@ class StringeeMessage {
     this._text = text;
   }
 
-  StringeeMessage.lstMsg(String msgId, String convId, MsgType msgType, String senderId,
-      int sequence, MsgState msgState, int createdAt, Map<dynamic, dynamic> msgInfor) {
+  StringeeMessage.lstMsg(
+      String msgId,
+      String convId,
+      MsgType msgType,
+      String senderId,
+      int sequence,
+      MsgState msgState,
+      int createdAt,
+      Map<dynamic, dynamic> msgInfor) {
     if (msgId == null ||
         msgType == null ||
         senderId == null ||
@@ -369,7 +379,8 @@ class StringeeMessage {
     this._senderId = senderId;
     this._createdAt = createdAt;
     this._sequence = sequence;
-    if (msgInfor.containsKey('metadata')) this._customData = msgInfor['metadata'];
+    if (msgInfor.containsKey('metadata'))
+      this._customData = msgInfor['metadata'];
     this._state = msgState;
     this._type = msgType;
     String text = '';
@@ -440,23 +451,27 @@ class StringeeMessage {
         this._notiContent['type'] = notifyType;
         switch (notifyType) {
           case MsgNotifyType.addParticipants:
-            StringeeUser user = new StringeeUser.fromJsonNotify(msgInfor['addedInfo']);
+            StringeeUser user =
+                new StringeeUser.fromJsonNotify(msgInfor['addedInfo']);
             this._notiContent['addedby'] = user;
             List<StringeeUser> participants = [];
             List<dynamic> participantArray = msgInfor['participants'];
             for (int i = 0; i < participantArray.length; i++) {
-              StringeeUser user = StringeeUser.fromJsonNotify(participantArray[i]);
+              StringeeUser user =
+                  StringeeUser.fromJsonNotify(participantArray[i]);
               participants.add(user);
             }
             this._notiContent["participants"] = participants;
             break;
           case MsgNotifyType.removeParticipants:
-            StringeeUser user = new StringeeUser.fromJsonNotify(msgInfor['removedInfo']);
+            StringeeUser user =
+                new StringeeUser.fromJsonNotify(msgInfor['removedInfo']);
             this._notiContent['removedBy'] = user;
             List<StringeeUser> participants = [];
             List<dynamic> participantArray = msgInfor['participants'];
             for (int i = 0; i < participantArray.length; i++) {
-              StringeeUser user = StringeeUser.fromJsonNotify(participantArray[i]);
+              StringeeUser user =
+                  StringeeUser.fromJsonNotify(participantArray[i]);
               participants.add(user);
             }
             this._notiContent["participants"] = participants;
@@ -508,8 +523,15 @@ class StringeeMessage {
         if (_vcard != null) params['vcard'] = _vcard.trim();
         break;
       case MsgType.sticker:
-        if (_stickerCategory != null) params['stickerCategory'] = _stickerCategory.trim();
+        if (_stickerCategory != null)
+          params['stickerCategory'] = _stickerCategory.trim();
         if (_stickerName != null) params['stickerName'] = _stickerName.trim();
+        break;
+      case MsgType.createConversation:
+        break;
+      case MsgType.renameConversation:
+        break;
+      case MsgType.notification:
         break;
     }
     return params;
@@ -534,6 +556,7 @@ class StringeeMessage {
       'msgId': this._id,
       'pinOrUnPin': pinOrUnPin,
     };
-    return await StringeeClient.methodChannel.invokeMethod('pinOrUnPin', params);
+    return await StringeeClient.methodChannel
+        .invokeMethod('pinOrUnPin', params);
   }
 }

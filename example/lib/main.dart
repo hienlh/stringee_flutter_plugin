@@ -8,86 +8,87 @@ import 'package:stringee_flutter_plugin_example/Chat.dart';
 
 import 'Call.dart';
 
-var token = 'PUT YOUR TOKEN HERE';
-
 StringeeClient _client = StringeeClient();
 
 String strUserId = "";
 
 void main() {
-  runApp(new MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(title: "OneToOneCallSample", home: new MyHomePage());
+    return MaterialApp(title: "OneToOneCallSample", home: MyHomePage());
   }
 }
 
 class MyHomePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _MyHomePageState();
   }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String myUserId = 'Not connected...';
+  String token;
+  String myUserId = 'Not connected';
   bool isAppInBackground = false;
 
   @override
-  Future<void> initState() {
-    // TODO: implement initState
+  void initState() {
     super.initState();
-
-    if (Platform.isAndroid) {
-      requestPermissions();
-    }
-
-    /// Lắng nghe sự kiện của StringeeClient(kết nối, cuộc gọi đến...)
-    _client.eventStreamController.stream.listen((event) {
-      Map<dynamic, dynamic> map = event;
-      switch (map['eventType']) {
-        case StringeeClientEvents.didConnect:
-          handleDidConnectEvent();
-          break;
-        case StringeeClientEvents.didDisconnect:
-          handleDiddisconnectEvent();
-          break;
-        case StringeeClientEvents.didFailWithError:
-          handleDidFailWithErrorEvent(map['body']['code'], map['body']['message']);
-          break;
-        case StringeeClientEvents.requestAccessToken:
-          handleRequestAccessTokenEvent();
-          break;
-        case StringeeClientEvents.didReceiveCustomMessage:
-          handleDidReceiveCustomMessageEvent(map['body']);
-          break;
-        case StringeeClientEvents.incomingCall:
-          StringeeCall call = map['body'];
-          handleIncomingCallEvent(call);
-          break;
-        case StringeeClientEvents.incomingCall2:
-          StringeeCall2 call = map['body'];
-          handleIncomingCall2Event(call);
-          break;
-        case StringeeClientEvents.didReceiveObjectChange:
-          StringeeObjectChange objectChange = map['body'];
-          print(objectChange.objectType.toString() + '\t' + objectChange.type.toString());
-          print(objectChange.objects.toString());
-          break;
-        default:
-          break;
+    (() async {
+      if (Platform.isAndroid) {
+        await requestPermissions();
       }
-    });
 
-    /// Connect
-    _client.connect(token);
+      /// Lắng nghe sự kiện của StringeeClient(kết nối, cuộc gọi đến...)
+      _client.eventStreamController.stream.listen((event) {
+        Map<dynamic, dynamic> map = event;
+        switch (map['eventType']) {
+          case StringeeClientEvents.didConnect:
+            handleDidConnectEvent();
+            break;
+          case StringeeClientEvents.didDisconnect:
+            handleDiddisconnectEvent();
+            break;
+          case StringeeClientEvents.didFailWithError:
+            handleDidFailWithErrorEvent(
+                map['body']['code'], map['body']['message']);
+            break;
+          case StringeeClientEvents.requestAccessToken:
+            handleRequestAccessTokenEvent();
+            break;
+          case StringeeClientEvents.didReceiveCustomMessage:
+            handleDidReceiveCustomMessageEvent(map['body']);
+            break;
+          case StringeeClientEvents.incomingCall:
+            StringeeCall call = map['body'];
+            handleIncomingCallEvent(call);
+            break;
+          case StringeeClientEvents.incomingCall2:
+            StringeeCall2 call = map['body'];
+            handleIncomingCall2Event(call);
+            break;
+          case StringeeClientEvents.didReceiveObjectChange:
+            StringeeObjectChange objectChange = map['body'];
+            print(objectChange.objectType.toString() +
+                '\t' +
+                objectChange.type.toString());
+            print(objectChange.objects.toString());
+            break;
+          default:
+            break;
+        }
+      });
+
+      /// Connect
+      _client.connect(token);
+    })();
   }
 
-  requestPermissions() async {
+  Future requestPermissions() async {
     List<PermissionName> permissionNames = [];
     permissionNames.add(PermissionName.Camera);
     permissionNames.add(PermissionName.Contacts);
@@ -102,24 +103,61 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget topText = new Container(
+    Widget topText = Container(
       padding: EdgeInsets.only(left: 10.0, top: 10.0),
-      child: new Text(
+      child: Text(
         'Connected as: $myUserId',
-        style: new TextStyle(
+        style: TextStyle(
           color: Colors.black,
           fontSize: 20.0,
         ),
       ),
     );
 
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("OneToOneCallSample"),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("OneToOneCallSample"),
         backgroundColor: Colors.indigo[600],
       ),
-      body: new Stack(
-        children: <Widget>[topText, new MyForm()],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            topText,
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.all(20.0),
+                    child: TextField(
+                      onChanged: (String value) {
+                        token = value;
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Enter your token here',
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                RaisedButton(
+                  color: Colors.grey[300],
+                  textColor: Colors.black,
+                  onPressed: () {
+                    _client.disconnect();
+                    _client.connect(token);
+                  },
+                  child: Text('Login'),
+                ),
+              ],
+            ),
+            MyForm(),
+          ],
+        ),
       ),
     );
   }
@@ -165,7 +203,9 @@ class _MyHomePageState extends State<MyHomePage> {
           fromUserId: call != null ? call.from : call2.from,
           toUserId: call != null ? call.to : call2.to,
           isVideoCall: call != null ? call.isVideoCall : call2.isVideoCall,
-          callType: call != null ? StringeeObjectEventType.call : StringeeObjectEventType.call2,
+          callType: call != null
+              ? StringeeObjectEventType.call
+              : StringeeObjectEventType.call2,
           showIncomingUi: true,
           incomingCall2: call != null ? null : call2,
           incomingCall: call != null ? call : null,
@@ -179,7 +219,6 @@ class _MyHomePageState extends State<MyHomePage> {
 class MyForm extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _MyFormState();
   }
 }
@@ -187,16 +226,15 @@ class MyForm extends StatefulWidget {
 class _MyFormState extends State<MyForm> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return new Form(
+    return Form(
 //      key: _formKey,
-      child: new Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          new Container(
+          Container(
             padding: EdgeInsets.all(20.0),
-            child: new TextField(
+            child: TextField(
               onChanged: (String value) {
                 _changeText(value);
               },
@@ -207,70 +245,70 @@ class _MyFormState extends State<MyForm> {
               ),
             ),
           ),
-          new Container(
-            child: new Column(
+          Container(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                new Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    new Column(
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        new Container(
+                        Container(
                           height: 40.0,
                           width: 175.0,
-                          child: new RaisedButton(
+                          child: RaisedButton(
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              _CallTapped(false, StringeeObjectEventType.call);
+                              _callTapped(false, StringeeObjectEventType.call);
                             },
                             child: Text('CALL'),
                           ),
                         ),
-                        new Container(
+                        Container(
                           height: 40.0,
                           width: 175.0,
                           margin: EdgeInsets.only(top: 20.0),
-                          child: new RaisedButton(
+                          child: RaisedButton(
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             onPressed: () {
-                              _CallTapped(true, StringeeObjectEventType.call);
+                              _callTapped(true, StringeeObjectEventType.call);
                             },
                             child: Text('VIDEOCALL'),
                           ),
                         ),
                       ],
                     ),
-                    new Column(
+                    Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        new Container(
+                        Container(
                           height: 40.0,
                           width: 175.0,
-                          child: new RaisedButton(
+                          child: RaisedButton(
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             padding: EdgeInsets.only(left: 20.0, right: 20.0),
                             onPressed: () {
-                              _CallTapped(false, StringeeObjectEventType.call2);
+                              _callTapped(false, StringeeObjectEventType.call2);
                             },
                             child: Text('CALL2'),
                           ),
                         ),
-                        new Container(
+                        Container(
                           height: 40.0,
                           width: 175.0,
                           margin: EdgeInsets.only(top: 20.0),
-                          child: new RaisedButton(
+                          child: RaisedButton(
                             color: Colors.grey[300],
                             textColor: Colors.black,
                             padding: EdgeInsets.only(left: 20.0, right: 20.0),
                             onPressed: () {
-                              _CallTapped(true, StringeeObjectEventType.call2);
+                              _callTapped(true, StringeeObjectEventType.call2);
                             },
                             child: Text('VIDEOCALL2'),
                           ),
@@ -279,11 +317,11 @@ class _MyFormState extends State<MyForm> {
                     ),
                   ],
                 ),
-                new Container(
+                Container(
                   height: 40.0,
                   width: 175.0,
                   margin: EdgeInsets.only(top: 20.0),
-                  child: new RaisedButton(
+                  child: RaisedButton(
                     color: Colors.grey[300],
                     textColor: Colors.black,
                     onPressed: () {
@@ -311,18 +349,22 @@ class _MyFormState extends State<MyForm> {
     });
   }
 
-  void _CallTapped(bool isVideoCall, StringeeObjectEventType callType) {
+  void _callTapped(bool isVideoCall, StringeeObjectEventType callType) {
     if (strUserId.isEmpty || !_client.hasConnected) return;
 
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => Call(
-              fromUserId: _client.userId,
-              toUserId: strUserId,
-              isVideoCall: isVideoCall,
-              callType: callType,
-              showIncomingUi: false)),
+        builder: (context) => Call(
+          fromUserId: _client.userId,
+          toUserId: strUserId,
+          isVideoCall: isVideoCall,
+          callType: callType,
+          showIncomingUi: false,
+          hasLocalStream: true,
+          hasRemoteStream: true,
+        ),
+      ),
     );
   }
 }

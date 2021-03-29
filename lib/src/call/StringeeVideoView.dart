@@ -10,13 +10,13 @@ import '../StringeeConstants.dart';
 
 class StringeeVideoView extends StatefulWidget {
   final String callId;
-  bool isLocal = true;
-  bool isOverlay = false;
-  bool isMirror = false;
+  final bool isLocal;
+  final bool isOverlay;
+  final bool isMirror;
   final EdgeInsetsGeometry margin;
   final AlignmentGeometry alignment;
   final EdgeInsetsGeometry padding;
-  ScalingType scalingType = ScalingType.fill;
+  final ScalingType scalingType;
   final double height;
   final double width;
   final Color color;
@@ -26,8 +26,8 @@ class StringeeVideoView extends StatefulWidget {
     this.callId,
     this.isLocal, {
     Key key,
-    this.isOverlay,
-    this.isMirror,
+    this.isOverlay = false,
+    this.isMirror = false,
     this.color,
     this.height,
     this.width,
@@ -35,7 +35,7 @@ class StringeeVideoView extends StatefulWidget {
     this.alignment,
     this.padding,
     this.child,
-    this.scalingType,
+    this.scalingType = ScalingType.fill,
   })  : assert(margin == null || margin.isNonNegative),
         assert(padding == null || padding.isNonNegative),
         super(key: key);
@@ -53,7 +53,6 @@ class StringeeVideoViewState extends State<StringeeVideoView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     creationParams = {
@@ -77,7 +76,8 @@ class StringeeVideoViewState extends State<StringeeVideoView> {
     }
 
     if (Platform.isAndroid) {
-      creationParams['isMirror'] = widget.isMirror == null ? false : widget.isMirror;
+      creationParams['isMirror'] =
+          widget.isMirror == null ? false : widget.isMirror;
     }
   }
 
@@ -86,10 +86,12 @@ class StringeeVideoViewState extends State<StringeeVideoView> {
       case TargetPlatform.android:
         return PlatformViewLink(
           viewType: viewType,
-          surfaceFactory: (BuildContext context, PlatformViewController controller) {
+          surfaceFactory:
+              (BuildContext context, PlatformViewController controller) {
             return AndroidViewSurface(
               controller: controller,
-              gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
+              gestureRecognizers: const <
+                  Factory<OneSequenceGestureRecognizer>>{},
               hitTestBehavior: PlatformViewHitTestBehavior.opaque,
             );
           },
