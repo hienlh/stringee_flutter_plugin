@@ -64,10 +64,10 @@ public class StringeeCallManager implements StringeeCall.StringeeCallListener {
             Map map = new HashMap();
             map.put("status", false);
             map.put("code", -1);
-            map.put("message", "StringeeClient is not initialized or disconnected.");
+            map.put("message", _client == null ? "StringeeClient is not initialized." : "StringeeClient is not connected.");
             result.success(map);
             return;
-        }
+}
         _mediaState = null;
         hasRemoteStream = false;
         remoteStreamShowed = false;
