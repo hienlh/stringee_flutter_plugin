@@ -14,7 +14,7 @@ class StringeeCall2 {
   StringeeCallType _callType;
   String _customDataFromYourServer;
   bool _isVideoCall = false;
-  StreamController<dynamic> _eventStreamController = StreamController();
+  StreamController<dynamic> _eventStreamController = StreamController.broadcast();
   StreamSubscription<dynamic> _subscriber;
 
   String get id => _id;
